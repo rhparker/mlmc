@@ -5,6 +5,7 @@ import math
 from scipy.stats import norm
 from mlmc_test import mlmc_test
 import ctypes
+from numpy.ctypeslib import ndpointer
 
 #
 # level 1 estimator, uses ctypes to call the c-version of estimator 
