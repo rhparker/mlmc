@@ -147,7 +147,7 @@ def mlmc(Lmin, Lmax, N0, eps, mlmc_l, gamma, **kwargs):
             if rem > math.sqrt(theta)*eps:
                 # if we are at the maximum level
                 if L == Lmax:
-                    print("*** failed to achieve weak convergence ***");
+                    print("*** failed to achieve weak convergence ***")
                 else:
                     converged = False;
                     # otherwise go up to the next level and recompute how many new

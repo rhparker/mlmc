@@ -112,8 +112,8 @@ def mlmc_test(mlmc_l, M, N, L, N0, Eps, Lmin, Lmax, **kwargs):
     print "*** MLMC complexity tests ***"
     print "*****************************"
     print 
-    print "  eps   mlmc_cost   std_cost    savings    N_l"
-    print "-----------------------------------------------"
+    print "  eps    mlmc_cost   std_cost    savings    N_l"
+    print "------------------------------------------------"
  
     cost_data = []
     level_data = []
@@ -130,7 +130,7 @@ def mlmc_test(mlmc_l, M, N, L, N0, Eps, Lmin, Lmax, **kwargs):
                 std_cost += var2[min(l, L)] * (M**l)
 
         std_cost = std_cost / ( ( 1.0 -theta)*(ep**2) )
-        print "{:4.3f}  {:.4e}  {:.4e}  {:8.2f}".format(
+        print "{:4.4f}  {:.4e}  {:.4e}  {:8.2f}".format(
                 ep, mlmc_cost, std_cost, std_cost/mlmc_cost), "  ", filter(None, Nl)
 
         cost_data.append( [ep, mlmc_cost, std_cost] )

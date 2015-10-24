@@ -29,13 +29,14 @@ def rbm_ball(l, N):
 
 # main program
 
-N = 10000   # samples for each level
-M  = 2      # refinement cost factor
-N0 = 100    # initial samples on each level
-Lmin = 2    # minimum refinement level
-Lmax = 5    # maximum refinement level
+N = 10000    # samples for each level for convergence tests
+M  = 2       # refinement cost factor
+N0 = 100     # initial samples on each level
+Lmin = 2     # minimum refinement level
+Lmax = 5     # maximum refinement level
 L = 5
-Eps = [0.0002, 0.0005, 0.001, 0.002, 0.005]
+# Eps = [0.0002, 0.0005, 0.001, 0.002, 0.005]
+Eps = [0.05, 0.02, 0.01, 0.005]
 
 
 mlmc_test( rbm_ball, M, N, L, N0, Eps, Lmin, Lmax, save="rbmball")

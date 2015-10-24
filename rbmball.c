@@ -18,8 +18,23 @@ float sum_squares(float *x, int dim) {
 	return s;
 }
 
+float step_size(int l, float *x, int dim) {
+	 return pow(2, -(l + 4) );
+}
+
+float adaptive_step(int l, float *x, int dim) {
+	float d;
+	float coarse, fine, d_factor;
+	d = 1 - sqrt( sum_squares(x, dim) );
+	coarse = pow(0.5, l + 4);
+	fine = pow(0.25, l + 4);
+	d_factor = (d/4)*(d/4);
+	return fmin( coarse, fmax(fine, d_factor) );
+
+}
+
 // reflect vector in unit ball
-void reflect(float *x, int dim) {
+int reflect(float *x, int dim) {
 	float sumsq;
 	float R;
 	float ratio;
@@ -30,51 +45,98 @@ void reflect(float *x, int dim) {
 		for (int i=0; i<dim; i++) {
 			x[i] = x[i] * ratio;
 		}
+		return(1);
+	}
+	else {
+		return(0);
 	}
 }
 
-void rbm_ball_single(float step_size, float steps, float *x, float dim, int *seed) {
+void zeros(float *x, int dim) {
+	for (int d = 0; d < dim; d++) {
+		x[d] = 0;
+	}
+}
+
+void add_to(float *x, float *y, int dim) {
+	for (int d = 0; d < dim; d++) {
+		x[d] += y[d];
+	}
+}
+
+void rand_norm(float *x, int dim, float variance, int *seed) {
+	float std_dev = sqrt(variance);
+	for (int d = 0; d < dim; d++) {
+		x[d] = r4_normal_ab(0, std_dev, seed);
+	}
+}
+
+int rbm_ball_single(int l, float end_time, float *x, int dim, int *seed) {
+	float t = 0;
+	int steps = 0;
+	int reflections = 0;
+	float rands[dim];
+	float h;
+
+	while (t < end_time) {
+		// h = step_size(l, x, dim);
+		h = adaptive_step(l, x, dim);
+		if (t + h >= end_time) {
+			h = end_time - t;
+		}
+		rand_norm(rands, dim, h, seed);
+		add_to(x, rands, dim);
+		reflections += reflect(x, dim);
+		t += h;
+		steps++;
+	}
+	return 0;
+}
+
+int rbm_ball_diff(int l, float end_time, float *xc, float *xf, int dim, int *seed) {
 	float std_dev;
-	std_dev = sqrt(step_size);
+	float t_old;
+	float t = 0;
+	float tc = 0;
+	float tf = 0;
+	float hc, hf;
+	float rands[dim];
+	float uc[dim];
+	float uf[dim];
 
-	for (int i = 0; i < steps; i++) {
-		for (int d = 0; d < dim; d++) {
-			x[d] += r4_normal_ab(0, std_dev, seed);
-		}
-		reflect(x, dim);
+	if (l == 0) {
+		return -1;
 	}
-}
+	zeros(uc, dim);
+	zeros(uf, dim);
 
-void rbm_ball_diff(float step_size, float steps, float *y, float *z, float dim, int *seed) {
-	float std_dev;
-	float randoms[20][2];
-	std_dev = sqrt(step_size / 2);
-	float large_step = sqrt(step_size);
-	float small_step = sqrt( step_size / 2 );
+	while (t < end_time) {
+		t_old = t;
+		t = fmin(tc, tf);
+		rand_norm(rands, dim, t - t_old, seed);
+		add_to(uf, rands, dim);
+		add_to(uc, rands, dim);
 
-	// for (int d = 0; d < dim; d++) {
-	// 	// generate random normals, uses same randoms for each path
-	// 	randoms[d][0] = r4_normal_ab(0, std_dev, seed);
-	// }
-
-	for (int i = 0; i < steps; i++) {
-		// y takes one big step
-		for (int d = 0; d < dim; d++) {
-			// y[d] += ( randoms[d][0] + randoms[d][1] );
-			y[d] += r4_normal_ab(0, large_step, seed);
+		if (t == tf) {
+			add_to(xf, uf, dim);
+			reflect(xf, dim);
+			// hf = step_size(l, xf, dim);
+			hf = fmin( adaptive_step(l, xf, dim), end_time - tf );
+			tf += hf;
+			zeros(uf, dim);
 		}
-		reflect(y, dim);
-		// z takes two small steps
-		for (int j = 0; j < 2; j++) {
-			for (int d = 0; d < dim; d++) {
-				// z[d] += randoms[d][j];
-				z[d] += r4_normal_ab(0, small_step, seed);
-			}
-			reflect(z, dim);
+		if (t == tc) {
+			add_to(xc, uc, dim);
+			reflect(xc, dim);
+			// hc = step_size(l - 1, xc, dim);
+			hc = fmin( adaptive_step(l - 1, xc, dim), end_time - tc);
+			tc += hc;
+			zeros(uc, dim);
 		}
+		// printf("t_o %f  t %f  t_c %f  t_f %f\n", t_old, t, tc, tf);
 	}
+	return 0;
 }
-
 
 void rbm_ball(int l, int N, double *sums) {
 
@@ -83,9 +145,9 @@ void rbm_ball(int l, int N, double *sums) {
 	// seed = time(NULL);
 
 	int dim = 3;
+	int block_size = 1000;
 
-	float T   = 1.0;
-	int initial_steps = 100;
+	float T = 1.0;
 	int steps;
 	float step_size;
 	float Pf[20], Pc[20];
@@ -103,19 +165,17 @@ void rbm_ball(int l, int N, double *sums) {
 			Pf[i] = 0;
 			Pc[i] = 0;
 		}
-
-		steps = initial_steps * pow(2, l);
-		step_size = T / steps;
-
 		if (l == 0) {
-			rbm_ball_single(step_size, steps, Pf, dim, &seed);
+			rbm_ball_single(l, T, Pf, dim, &seed);
 			Df = sum_squares(Pf, dim);
 			Dc = 0;
 		}
 		else {
-			rbm_ball_diff(step_size, steps, Pc, Pf, dim, &seed);
-			Df = sum_squares(Pf, dim);
+			// rbm_ball_single(l, T, Pc, dim, &seed);
+			// rbm_ball_single(l, T, Pf, dim, &seed);
+			rbm_ball_diff(l, T, Pc, Pf, dim, &seed); 
 			Dc = sum_squares(Pc, dim);
+			Df = sum_squares(Pf, dim);
 			// printf("%f %f \n", Df, Dc);
 		}
 		dP = Df - Dc;
@@ -126,7 +186,7 @@ void rbm_ball(int l, int N, double *sums) {
 		sums[2] += dP*dP*dP;
 		sums[3] += dP*dP*dP*dP;
 		sums[4] += Df;
-		sums[5] += Df;
+		sums[5] += Df*Df;
 	}
 
 
@@ -134,7 +194,7 @@ void rbm_ball(int l, int N, double *sums) {
 
 int main() {
 	double sums[6];
-	int N = 1000;
+	int N = 100;
 	for (int i = 0; i <= 5; i++) {
 		rbm_ball(i, N, sums);
 		printf("Level %d, %f %f\n", i, sums[0], sums[4]);
