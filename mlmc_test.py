@@ -32,6 +32,17 @@
 
 import numpy as np
 from mlmc import mlmc, regression
+from time import time, strftime
+
+# analogs of tic/toc in Matlab
+_tstart_stack = []
+
+def tic():
+    _tstart_stack.append(time())
+
+def toc(fmt="Elapsed: %s s"):
+    return time() - _tstart_stack.pop()
+    # print fmt % (time() - _tstart_stack.pop())
 
 def mlmc_test(mlmc_l, M, N, L, N0, Eps, Lmin, Lmax, **kwargs):
     # first, convergence test
@@ -48,9 +59,13 @@ def mlmc_test(mlmc_l, M, N, L, N0, Eps, Lmin, Lmax, **kwargs):
     var2 = np.zeros(L+1)
     chk1 = np.zeros(L+1)
     kur1 = np.zeros(L+1)
+    cost = []
 
     for l in xrange(0, L+1):
+        # generate mlmc samples, use actualy computation time for cost
+        tic()
         sums = np.array( mlmc_l( l, N ) ) / N
+        cost.append( toc() )
 
         del1[l] = sums[0];
         del2[l] = sums[4];
@@ -96,7 +111,8 @@ def mlmc_test(mlmc_l, M, N, L, N0, Eps, Lmin, Lmax, **kwargs):
         y[l-1] = -np.log2( np.absolute( var1[l]) )
     beta, sumsq = regression(L, x, y)
 
-    gamma = np.log2(M)
+    gamma = np.log2( cost[-1] / cost[-2] )
+    # gamma = np.log2(M)
 
     print "******************************************************"
     print "*** Linear regression estimates of MLMC parameters ***"
