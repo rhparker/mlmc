@@ -12,7 +12,7 @@ from numpy.ctypeslib import ndpointer
 # (recommended for speed)
 # 
 
-_rbmball = ctypes.CDLL('rbmball.so')
+_rbmball = ctypes.CDLL('./rbmball.so')
 # void mcqmc06_l(int l, int N, int option, double *sums) 
 rbm_ball = _rbmball.rbm_ball
 # rbm_ball.argtypes = (ctypes.c_int, ctypes.c_int, ctypes.POINTER(ctypes.c_double * 6) )
