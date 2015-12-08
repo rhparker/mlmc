@@ -94,13 +94,14 @@ In this functional SDE, $\Gamma(H)(t)$ depends on the entire past up to time $t$
 \end{equation}
 where we take $H_i(s) = 0$ for $s < 0$. Then we can define the new coefficient functions by:
 \begin{align*}
-\tilde{b}&: C[0, T] \rightarrow \mathbb{R}^d && \tilde{b}_i(X_t) = b( \Gamma(X_t)(T)) \\
-\tilde{\sigma}&: C[0, T] \rightarrow \mathbb{R}^d \times \mathbb{R}^d && \tilde{\sigma}(X_t) = \sigma(\Gamma(X_t)(T))
+\tilde{b}&: C[-T, 0] \rightarrow \mathbb{R}^d && \tilde{b}_i(Y_t) = b( \Gamma(Y_t)(0)) \\
+\tilde{\sigma}&: C[-T, 0] \rightarrow \mathbb{R}^d \times \mathbb{R}^d && \tilde{\sigma}(Y_t) = \sigma(\Gamma(Y_t)(0))
 \end{align*}
 Which lets us rewrite the system as:
-\begin{equation}
+\begin{equation} \label{eq:fSDE}
 H_i(t) =  \underbrace{ \int_0^t \tilde{b}_i(\tilde{H}_s)}_{A_i(t)}+ \underbrace{\sum_{j=1}^d \int_0^t  \tilde{\sigma}_{ij}(\tilde{H}_s)dW_s }_{M_i(t)}
 \end{equation}
+By construction, $\tilde{b}_i(\tilde{H}_s)$ and $\tilde{\sigma}_{ij}(\tilde{H}_s)$ are $F_s$-measurable (this uses the fact that the Skorokhod map only depends on the past; although this is essentially clear, would like to find a reference for this.) \\ \\
 
 We will consider two cases for the reflecting boundary conditions. First, in the case where U is a convex polygon with nonempty interior and the reflection directions are normal, there is a unique solution to the Skorokhod problem, and the Skorokhod map $\Gamma$ is Lipschitz continuous \cite{Dupuis91}. This can be extended to oblique reflections when U is a convex polygon and the reflection directions are constant on each face and satisfy conditions (look these up!) \cite{Dupuis91}. In the case of normal reflection inside a general smooth, open domain, Lions and Sznitman \cite[Theorem 1.1]{Lions84} showed that there is again a unique solution to the Skorokhod problem, but that the Skohokhod map $\Gamma$ is only Holder continuous of order 1/2 on $[0, T]$.
 
@@ -131,9 +132,37 @@ where $A_i(s)$ and $M_i(s)$ are as defined above. Then we have:
 \end{align*}
 where in the last line we have removed the absolute value since $A_i(0) = 0$ and $M_i(0) = 0$. We will then bound the two terms on the RHS individually.
 
-\subsection{Ordinary Integral}
+\subsubsection{Existence and Uniqueness of Solution to Functional SDE}
+To show existence and uniqueness of solutions to \ref{eq:fSDE}, we need to show that the coefficient functions are Lipschitz and satisfy the standard growth condition. For $Y_t, Z_t \in C[-T, 0]$, we have Lipschitz condition:
+\begin{align*}
+\abs{ \tilde{b}(Z_t) - \tilde{b}(Y_t) } &= \abs{ b(\Gamma(Z_t)(0) - b(\Gamma(Y_t)(0) } \\
+&\leq K_1 \abs{ \Gamma(Z_t)(0) - \Gamma(Y_t)(0)} \\
+&\leq K_1 \sup_{[-T, 0]} \abs{ \Gamma(Z_t)(s) - \Gamma(Y_t)(s)} \\
+&\leq K_1 C_T \sup_{[-T, 0]} \abs{ Z_t(s) - Y_t(s)}
+\end{align*}
+and growth condition:
+\begin{align*}
+\abs{ \tilde{b}(Y_t) }^2 &= \abs{ b(\Gamma(Y_t)(0) }^2 \\
+&\leq K_2 ( 1 + \abs{ (\Gamma(Y_t)(0) }^2  ) \\
+&\leq K_2 (1 + \sup_{[-T, 0]} \abs{ (\Gamma(Y_t)(s) }^2 ) \\
+&\leq K_2 ( 1 + C_T^2  \sup_{[-T, 0]} \abs{ Y_t(s) } ^2 ) \\
+&\leq \begin{cases}
+K_2( 1+  (\sup_{[-T, 0]} \abs{ Y_t(s) }) ^2 ) & \mbox{if }C_T \leq 1 \\
+K_2 C_T^2( 1+  (\sup_{[-T, 0]} \abs{ Y_t(s) }) ^2 ) & \mbox{if }C_T > 1 
+\end{cases}
+\end{align*}
+The same is true for the diffusion coefficient function $\sigma$. Thus we have a unique solution $H_t$ to \ref{eq:fSDE} \cite[Ch. 5, Theorem 2.2]{Mao97}, and for this solution we have:
+\begin{equation}
+\mathbb{E}\int_0^T \abs{H_t}^2 dt < \infty
+\end{equation}
+(I am pretty sure this last one is what is implied by the notation $M^2$ in \cite{Mao97}, but I would need to see the entire text, not just the Google books preview, and the library seems to be missing their copy.)
 
-\subsection{Stochastic Integral}
+\subsubsection{Ordinary Integral}
+First we will bound the ordinary integral $A(t)$.
+
+\subsubsection{Exponential Martingale}
+
+\subsubsection{Stochastic Integral}
 
 % references
 \begin{thebibliography}{9}
