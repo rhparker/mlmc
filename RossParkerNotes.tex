@@ -88,7 +88,19 @@ In component form, this is:
 \begin{equation}
 H_i(t) =  \underbrace{ \int_0^t b_i(\Gamma(H)(s))ds }_{A_i(t)}+ \underbrace{\sum_{j=1}^d \int_0^t  \sigma_{ij}(\Gamma(H)(s))dW_s }_{M_i(t)}
 \end{equation}
-In this functional SDE, $\Gamma(H)(t)$ depends on the entire past up to time $t$, i.e. depends on $H_s, 0 \leq s \leq t$. \\ \\
+In this functional SDE, $\Gamma(H)(t)$ depends on the entire past up to time $t$, i.e. depends on $H_s, 0 \leq s \leq t$. We will rewrite this equation to make its functional nature explicit. (This is based on \cite[Chapter 5]{Mao97} ). Before we do that, so that the domain of our coefficient functions will be consistent, we define the past history of a process $H$ at time $t$ to be the process $\tilde{H}_t \in C[-T, 0]$ given by:
+\begin{equation}
+\tilde{H}_t(r) = \{H_i(t + r), r \in [-T, 0] \}
+\end{equation}
+where we take $H_i(s) = 0$ for $s < 0$. Then we can define the new coefficient functions by:
+\begin{align*}
+\tilde{b}&: C[0, T] \rightarrow \mathbb{R}^d && \tilde{b}_i(X_t) = b( \Gamma(X_t)(T)) \\
+\tilde{\sigma}&: C[0, T] \rightarrow \mathbb{R}^d \times \mathbb{R}^d && \tilde{\sigma}(X_t) = \sigma(\Gamma(X_t)(T))
+\end{align*}
+Which lets us rewrite the system as:
+\begin{equation}
+H_i(t) =  \underbrace{ \int_0^t \tilde{b}_i(\tilde{H}_s)}_{A_i(t)}+ \underbrace{\sum_{j=1}^d \int_0^t  \tilde{\sigma}_{ij}(\tilde{H}_s)dW_s }_{M_i(t)}
+\end{equation}
 
 We will consider two cases for the reflecting boundary conditions. First, in the case where U is a convex polygon with nonempty interior and the reflection directions are normal, there is a unique solution to the Skorokhod problem, and the Skorokhod map $\Gamma$ is Lipschitz continuous \cite{Dupuis91}. This can be extended to oblique reflections when U is a convex polygon and the reflection directions are constant on each face and satisfy conditions (look these up!) \cite{Dupuis91}. In the case of normal reflection inside a general smooth, open domain, Lions and Sznitman \cite[Theorem 1.1]{Lions84} showed that there is again a unique solution to the Skorokhod problem, but that the Skohokhod map $\Gamma$ is only Holder continuous of order 1/2 on $[0, T]$.
 
