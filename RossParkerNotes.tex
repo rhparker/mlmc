@@ -99,13 +99,13 @@ where we take $H_i(s) = 0$ for $s < 0$. Then we can define the new coefficient f
 \end{align*}
 Which lets us rewrite the system as:
 \begin{equation} \label{eq:fSDE}
-H_i(t) =  \underbrace{ \int_0^t \tilde{b}_i(\tilde{H}_s)}_{A_i(t)}+ \underbrace{\sum_{j=1}^d \int_0^t  \tilde{\sigma}_{ij}(\tilde{H}_s)dW_s }_{M_i(t)}
+H_i(t) =  \underbrace{ \int_0^t \tilde{b}_i(\tilde{H}_s) ds}_{A_i(t)}+ \underbrace{\sum_{j=1}^d \int_0^t  \tilde{\sigma}_{ij}(\tilde{H}_s)dW_s }_{M_i(t)}
 \end{equation}
 By construction, $\tilde{b}_i(\tilde{H}_s)$ and $\tilde{\sigma}_{ij}(\tilde{H}_s)$ are $F_s$-measurable (this uses the fact that the Skorokhod map only depends on the past; although this is essentially clear, would like to find a reference for this.) \\ \\
 
 We will consider two cases for the reflecting boundary conditions. First, in the case where U is a convex polygon with nonempty interior and the reflection directions are normal, there is a unique solution to the Skorokhod problem, and the Skorokhod map $\Gamma$ is Lipschitz continuous \cite{Dupuis91}. This can be extended to oblique reflections when U is a convex polygon and the reflection directions are constant on each face and satisfy conditions (look these up!) \cite{Dupuis91}. In the case of normal reflection inside a general smooth, open domain, Lions and Sznitman \cite[Theorem 1.1]{Lions84} showed that there is again a unique solution to the Skorokhod problem, but that the Skohokhod map $\Gamma$ is only Holder continuous of order 1/2 on $[0, T]$.
 
-\subsection{Lipschitz continuity of Skorokhod map}
+\subsection{Case 1: Lipschitz continuity of Skorokhod map}
 First, consider the case where we have a unique solution to the Skorokhod problem, and the map $\Gamma$ is Lipschitz continuous. Recall that the Skorohod map is a map $\Gamma: C[0, T] \rightarrow C[0, T]$, where we are using the $L^\infty$ norm on $C[0, T]$. Let $C_T$ be the Lipschitz constant. Then since $\Gamma(H) = X$, we have:
 \[
 \sup_{[0, T]} \abs{ X(s) } \leq C_T \sup_{[0, T]} \abs{ (H)(s) }
@@ -119,7 +119,7 @@ Then we have the following set of inequalities concerning the proposition we are
 \mathbb{P}\left(\sup_{[0, t]} \norm{X_s} \geq \eta \right) &\leq  \mathbb{P}\left(\sup_{[0, t]} C_T\norm{H_s} \geq \eta \right) \\
 &= \mathbb{P}\left(\sup_{[0, t]} \norm{H_s} \geq \frac{\eta}{C_T} \right)
 \end{align*}
-Since all (reasonable) norms on $\mathbb{R}^d$ are equivalent, we will choose the $l^1$ norm.
+Since all norms on $\mathbb{R}^d$ are equivalent, we will choose the $l^1$ norm.
 \begin{align*}
 \mathbb{P}\left(\sup_{[0, t]} \norm{X_t} \geq \eta \right) &\leq \mathbb{P}\left(\sup_{[0, t]} \sum_{i=i}^d \abs{H_i(s)} \geq \frac{\eta}{C_T} \right) \\
 &\leq \sum_{i=i}^d \mathbb{P}\left(\sup_{[0, t]}  \abs{H_i(s)} \geq \frac{\eta}{C_T d} \right) \\
@@ -158,11 +158,80 @@ The same is true for the diffusion coefficient function $\sigma$. Thus we have a
 (I am pretty sure this last one is what is implied by the notation $M^2$ in \cite{Mao97}, but I would need to see the entire text, not just the Google books preview, and the library seems to be missing their copy.)
 
 \subsubsection{Ordinary Integral}
-First we will bound the ordinary integral $A(t)$.
+First we will find a bound the ordinary integral $A(t)$. \\ \\
+Case 1: the coefficient function $b(x)$ is bounded. \\ \\
+Suppose $\abs{b(x)} \leq K_b$ for all $x$. This implies that $\abs{\tilde{b}(Y_t)} \leq K_b$ for all $Y_t \in C[-T, 0]$. Then we have for all $\lambda > 0$:
+\begin{align*}
+\mathbb{P}\left(\sup_{[0, t]}  A_i(s)  \geq \frac{\eta}{2 C_T d} \right) &= \mathbb{P}\left(\sup_{[0, t]}  \exp \lambda A_i(s)^2  \geq \exp \lambda \left(\frac{\eta}{2 C_T d}\right)^2 \right) \\
+&\leq \mathbb{P}\left(\sup_{[0, t]}  \exp \lambda \left[ \int_0^s \tilde{b}_i(\tilde{H}_r) dr\right]^2  \geq \exp \lambda \left(\frac{\eta}{2 C_T d}\right)^2 \right) \\
+&\leq \mathbb{P}\left(\sup_{[0, t]}  \exp \lambda  \int_0^s \tilde{b}_i(\tilde{H}_r)^2 dr  \geq \exp \lambda \left(\frac{\eta}{2 C_T d}\right)^2 \right) \\
+&\leq \mathbb{P}\left( \exp \lambda  \int_0^t \tilde{b}_i(\tilde{H}_r)^2 dr  \geq \exp \lambda \left(\frac{\eta}{2 C_T d}\right)^2 \right)
+\end{align*}
+By Chebyshev's inequality, we have:
+\begin{align*}
+\mathbb{P}\left(\sup_{[0, t]}  A_i(s)  \geq \frac{\eta}{2 C_T d} \right) &\leq \mathbb{E}\left[ \exp \lambda  \int_0^t \tilde{b}_i(\tilde{H}_r)^2 dr \right] / \exp \lambda \left(\frac{\eta}{2 C_T d}\right)^2 \\
+&\leq \exp \left( \lambda K_b^2t \right) \exp \left( -\lambda \left( \frac{\eta}{2 C_T d} \right)^2 \right)\\
+&= \exp \left( K_b^2\right) \exp \left( - \frac{\eta^2}{4 C_T^2 d^2 t} \right)
+\end{align*}
+where in the last line we have chosen $\lambda = 1/t$.
 
 \subsubsection{Exponential Martingale}
+We consider the following exponential function for $\lambda > 0$:
+\begin{equation} \label{expmg}
+Z_i(t) = \exp \left\{ \sum_{j=1}^d \lambda \int_0^t \tilde{\sigma}_{ij}(\tilde{H}_s) dW_j(s) - \frac{1}{2} \lambda^2 \int_0^t  \norm{ \tilde{\sigma}_i(\tilde{H}_s) }^2 ds  \right\}
+\end{equation}
+Here we take the $l^2$ norm on $\mathbb{R}^d$, which gives us:
+\begin{equation} \label{expmg2}
+Z_i(t) = \exp \left\{ \sum_{j=1}^d \lambda \int_0^t \tilde{\sigma}_{ij}(\tilde{H}_s) dW_j(s) - \frac{1}{2} \lambda^2 \int_0^t \sum_{j=1}^d \abs{ \tilde{\sigma}_{ij}(\tilde{H}_s) }^2 ds  \right\}
+\end{equation}
+Following the analysis in \cite[p. 191]{KS91}, we first show that $Z_i(t)$ is a local martingale. By the property that the Skorokhod map $\Gamma$ only depends on the past of a stochastic process, $\tilde{\sigma}_{ij}(\tilde{H}_s)$ is a measurable, $F_s$-adapted process for all $s$. Furthermore for all $j$ we have:
+
+For our analysis, we would like $Z_i(t)$ to be a martingale. \\
+
+Case 1: the coefficient function $\sigma(x)$ is bounded. \\
+
+Suppose $\abs{\sigma_{ij}(x)} \leq K_s$ for all $i, j, x$. Then we can use the Novikov condition \cite[Corr 5.15, p. 199]{KS91}:
+\begin{align*}
+\mathbb{E}\left[ \exp\left( \frac{1}{2} \int_0^T \norm{\tilde{\sigma}_i(\tilde{H}_s) }^2 ds \right) \right] &= \mathbb{E}\left[ \exp\left( \frac{1}{2} \int_0^T \sum_{j=1}^d \abs{\tilde{\sigma}_{ij}(\tilde{H}_s)}^2 ds \right) \right] \\
+&\leq \exp \left( \frac{1}{2} TdK_s^2 \right) < \infty
+\end{align*}
+Since the Novikov condition is satisfied, $Z_i(t)$ is a martingale in this case.
 
 \subsubsection{Stochastic Integral}
+Recall that:
+\[
+M_i(t) = \sum_{j=1}^d \int_0^t  \tilde{\sigma}_{ij}(\tilde{H}_s)dW_s
+\]
+$M_i(t)$ is a stochastic integral, and so is a continuous local martingale. The fact that is is a true martingale follows from the square integrability of the solution $H_t$ (CHECK THIS!) \\
+
+Since the function $\exp \lambda x$ is convex, $\exp \lambda M_i(t)$ is a submartingale. Thus by the fact that $\exp \lambda x$ is increasing and by Doob's martingale inequality:
+\begin{align*}
+\mathbb{P}\left(\sup_{[0, t]}  M_i(s) \geq \frac{\eta}{2 C_T d} \right) &\leq \mathbb{P}\left(\sup_{[0, t]}  \exp \left( \lambda M_i(s) \right) \geq \exp \left( \frac{ \lambda \eta}{2 C_T d} \right)  \right) \\
+&\leq \mathbb{E} \exp \left( \lambda M_i(t) \right) / \exp \left( \frac{\lambda \eta}{2 C_T d} \right)
+\end{align*}
+
+
+Here we use the exponential martingale $Z_i(t)$ from above. Since we have $\mathbb{E}Z_i(t) = 1$ for all $t$ by the martingale property:
+\begin{align*}
+1 &= \mathbb{E}  \exp \left\{ \sum_{j=1}^d \lambda \int_0^t \tilde{\sigma}_{ij}(\tilde{H}_s) dW_j(s) - \frac{1}{2} \lambda^2 \int_0^t \sum_{j=1}^d \abs{ \tilde{\sigma}_{ij}(\tilde{H}_s) }^2 ds  \right\} \\
+&= \mathbb{E} \exp \left( \lambda M_i(t) \right) \exp \left\{ -\frac{1}{2} \lambda^2 \int_0^t \sum_{j=1}^d \abs{ \tilde{\sigma}_{ij}(\tilde{H}_s) }^2 ds  \right\}
+\end{align*}
+Case 1: the coefficient function $\sigma(x)$ is bounded. \\
+
+As above, we take $\abs{\sigma_{ij}(x)} \leq K_s$ for all $i, j, x$. Then we have:
+\begin{align*}
+1 &\geq \mathbb{E} \exp \left( \lambda M_i(t) \right) \exp \left( - \frac{1}{2} \lambda^2 tdK_s^2 \right) \\
+\mathbb{E} \exp \left( \lambda M_i(t) \right) &\leq \exp \left( \frac{1}{2} \lambda^2  tdK_s^2 \right) 
+\end{align*}
+Using this bound above gives us:
+\begin{align*}
+\mathbb{P}\left(\sup_{[0, t]}  M_i(s) \geq \frac{\eta}{2 C_T d} \right) &\leq \exp \left( \frac{1}{2} \lambda^2  tdK_s^2 \right) / \exp \left( \frac{\lambda \eta}{2 C_T d} \right) \\
+&= \exp \left( \frac{1}{2} \lambda^2  tdK_s^2 - \frac{\lambda \eta}{2 C_T d} \right)
+\end{align*}
+Inside the parentheses on the RHS is a quadratic in $\lambda$, which takes it's minimum value at the vertex $\lambda = \eta / 2 C_T d^2 K_s^2 t$. Substituting this value of $\lambda$ gives us:
+\begin{equation}
+\mathbb{P}\left(\sup_{[0, t]}  M_i(s) \geq \frac{\eta}{2 C_T d} \right) \leq \exp \left( - \frac{\eta^2}{t} \frac{1}{8 C_T^2 d^3 K_s^2} } \right)
+\end{equation}
 
 % references
 \begin{thebibliography}{9}
@@ -170,6 +239,8 @@ First we will bound the ordinary integral $A(t)$.
 \bibitem{Dupuis91}Dupuis, P. and Ishii, H. (1991) On Lipschitz continuity of the solution
 mapping to the Skorokhod problem, with applications, Stochastics and Stochastic Reports,
 35:1, 31-62.
+
+\bibitem{KS91}Karatzas, I. and Shreve S. Brownian Motion and Stochastic Calculus (1991) Springer: Graduate Texts in Mathematics, Volume 113
 
 \bibitem{Lions84} Lions, P. L. and Sznitman, A. S. (1984), Stochastic differential equations with reflecting boundary conditions. Comm. Pure Appl. Math., 37: 511–537.
 
