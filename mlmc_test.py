@@ -145,7 +145,7 @@ def mlmc_test(mlmc_l, M, N, L, N0, Eps, Lmin, Lmax, **kwargs):
                 mlmc_cost += (1.0 + 1.0/M) * Nl[l] * (M**l)
                 std_cost += var2[min(l, L)] * (M**l)
 
-        std_cost = std_cost / ( ( 1.0 -theta)*(ep**2) )
+        std_cost = std_cost / ( ( 1.0 - theta)*(ep**2) )
         print "{:4.4f}  {:.4e}  {:.4e}  {:8.2f}".format(
                 ep, mlmc_cost, std_cost, std_cost/mlmc_cost), "  ", filter(None, Nl)
 

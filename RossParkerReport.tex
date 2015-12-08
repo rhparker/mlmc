@@ -1,0 +1,119 @@
+\documentclass[]{article}
+
+\usepackage{amsmath}
+\usepackage{enumerate}
+\usepackage{amssymb}                
+\usepackage{amsmath}                
+\usepackage{amsfonts}
+\usepackage{amsthm}
+\usepackage{hyperref}               
+\usepackage{graphicx}   
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage {tikz}
+\usetikzlibrary{automata,arrows,positioning,calc}
+\usepackage{float}
+\restylefloat{table}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+
+\theoremstyle{remark}
+\newtheorem*{question}{Question}
+\newtheorem*{observation}{Observation}
+\newtheorem*{example}{Example}
+\newtheorem*{remark}{Remark}
+
+\begin{document}
+
+\title{MLMC with Reflected Brownian Motion}
+\author{Ross Parker}
+\maketitle
+
+\section{Week of 10/19/2015}
+\subsection{Code conversion}
+FIrst, I converted the MatLab/C++ code from Giles to Python. This includes the MLMC routine itself, together with the MLMC-test routine (a whole battery of tests designed by Giles) and the MLMC-plot routine (makes the plots he uses in his paper). Although the code can be run completely in Python, I have found that for large number of iterations the code runs slowly (on my 2010 laptop). The portion of the code which is most computationally demanding is the low-level routine which does the multi-level sampling specific to the SDE (or other system) under study. I have set up the code so that this low-level code is run in C, where the high-level MLMC code is run in Python. This performs at the same speed as the Giles C++ code, and runs approximately 250x faster than the code in Python alone. I did discover one small mistake in the Giles C++ code (in comparison to the Matlab code). Line 157 of \texttt{mlmc.cpp} currently reads:
+\begin{verbatim}
+float rem = ml[L] / (powf(2.0f,gamma)-1.0f);
+\end{verbatim}
+The equivalent line in \texttt{mlmc.m} is line 118.
+\begin{verbatim}
+rem = ml(L+1) / (2^alpha - 1);
+\end{verbatim}
+I believe the Matlab line is correct, since this should involve the $\alpha$, the constant for weak convergence rather than $\gamma$, the constant for sample cost. I corrected line 157 of \texttt{mlmc.cpp} to read:
+\begin{verbatim}
+float rem = ml[L] / (powf(2.0f, alpha)-1.0f);
+\end{verbatim}
+I made the similar correction in my adaptation to Python, which combines aspects of the C++ and Matlab code. To test my Python code, I performed a simulation of a European call option, as in Giles (2015). The high level code is in Python, while the low-level sampler is written in C. The plots are shown in figure 1, which can be compared to Figure 5.3 in Giles (2015). While the plots are not exactly the same (likely due to differences in random number generators, etc) the overall shapes are consistent with those found in his paper, so I believe I my conversion to Python/C is successful.
+
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=150mm]{euro.pdf}
+\caption{European call option using Euler-Maruyama discretisation. Compare to Figure 5.3 in Giles (2015).}
+\end{figure}
+
+\subsection{RBM in unit ball}
+I read through the introduction and algorithm in Bossy, Gobet, and Talay (2004). The first example Giles uses in his notes is based on section 4 in this paper; specifically it is a simple 3-dimensional RBM contained in the unit ball. The assumptions in this paper (section 2.1) are a bounded domain which has class $C^5$. This is true for this example, but is not the case in the orthant, which is what we are interested in. I assume that is at least part of the reason for what we are doing. I wrote a version of the Bossy, Gobet, and Talay scheme in the case of simple RBM in the unit sphere, with low level code in C.
+
+\section{Week of 10/26/2015}
+\subsection{RBM in unit ball}I performed a MLMC simulation of RBM in 3-dimensional unit ball starting at the origin, ala Bossy, Gobet, and Talay (2004). I ran simulations both for nonadaptive time step (not done by Giles) and adaptive time step (from Giles unpublished notes). The non-adaptive time step for level $l$ is:
+\[
+\Delta t_l = \frac{1}{2^{l+4}}
+\]
+The minimum time step (level 0) is 1/16 (as opposed to 1/8 in the Giles notes). For the adaptive time step, I use the scheme from section 5.1 of the Giles notes, again with a slight modification to make the minimum time step 1/16:
+\[
+\Delta t_l = \textrm{min} \left( \frac{1}{2^{l+4}}, \textrm{max} \left( \frac{1}{2^{2(l+4)}}, \left( \frac{d}{4}\right)^2\right) \right)
+\] 
+where $d$ is the distance to the boundary. Essentially the time step is determined by $(d/4)^2$, which is cutoff at a maximum of $2^{-(l+4)}$ and a minimum of $2^{-2(l+4)}$. The adaptive time step performs significantly better, i.e. requires many fewer samples to converge. For $\epsilon = 0.001$, convergence was achieved with only three levels using an adaptive time step, while convergence required nine levels with a nonadaptive time step. The convergence and cost parameters for the simulations are:
+\begin{table}[H]
+\centering
+\label{my-label}
+\begin{tabular}{lll}
+                                            & adaptive timestep & nonadaptive timestep \\ \cline{2-3} 
+\multicolumn{1}{l|}{levels for convergence} & 3                 & 9                    \\
+\multicolumn{1}{l|}{convergence parameter $\alpha$}               & 1.31              & 0.86                 \\
+\multicolumn{1}{l|}{variance parameter $\beta$}                & 2.00              & 0.96                 \\
+\multicolumn{1}{l|}{cost parameter $\gamma$}               & 1.07              & 0.89                
+\end{tabular}
+\end{table}
+The information is displayed graphically in figures 2 and 3. The nonadaptive time step was not done by Giles. Figure 3 (adaptive time step) is the analogue of Figure 1 in section 5.1 of the Giles notes.
+
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=150mm]{output/rbmball_nonadaptive.pdf}
+\caption{RBM in 3D unit ball, nonadative timestep}
+\end{figure}
+
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=150mm]{output/rbmball_adaptive.pdf}
+\caption{RBM in 3D unit ball, adative timestep. Compare to Figure 1 in Giles unpublished notes (2015)}
+\end{figure}
+
+\subsection{RBM in first quadrant}
+I performed a MLMC simulation of RBM in the first quadrant of the plane (2 dimensions) starting at the point (0.2, 0.2). The number of samples required is much larger than for the the 3 dimensional unit ball, possibly due to the nonsmooth boundary at the origin. Only the adaptive timestepping scheme was used; the same adaptive timestep is used here as above in the unit ball case. Here the experiment has parameters $\alpha = 1.49, \beta = 2.04, \gamma = 1.13$. The information is displayed graphically in figure 4 (compare to Figure 2 in section 5.2 of the Giles notes.)
+
+\begin{figure}[ht!]
+\centering
+\includegraphics[width=150mm]{output/rbmquad.pdf}
+\caption{RBM in first quadrant of plane, adative timestep. Compare to Figure 2 in Giles unpublished notes (2015)}
+\end{figure}
+
+\subsection*{To Do}
+\begin{enumerate}
+\item Get my code working with more examples so I can experiment with different schemes, e.g. adaptive timestepping near boundary.
+\end{enumerate}
+
+\subsection*{References}
+\begin{enumerate}
+\item Bossy, M., Gobet, E., and Talay, D., A Symmetrized Euler Scheme for an Efficient Approximation of Reflected Diffusions. Journal of Applied Probabilty 41, 877-889 (2004) 
+\item Giles, M., Multilevel Monte Carlo methods. Acta Numerica 24, 259-328 (2015).
+\item Giles, M., Unpublished notes on personal website (2015).
+\end{enumerate}
+
+\end{document}

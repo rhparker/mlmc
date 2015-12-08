@@ -1,4 +1,3 @@
-
 #
 # mlmc.py
 #
@@ -111,6 +110,10 @@ def mlmc(Lmin, Lmax, N0, eps, mlmc_l, gamma, **kwargs):
         # set optimal number of additional samples needed at each level
         # we make our estimate then subtract how many samples we currently
         # have at each level
+        # for l in range(L+1):
+        #     Ns = np.ceil( math.sqrt( Vl[l]/Cl[l] ) * csum / ( (1.0-theta)*(eps**2) ) )
+        #     dNl[l] = int( max( 0, Ns - suml[0][l] ) )
+
         for l in range(L+1):
             Ns = max(0, math.sqrt( Vl[l]/Cl[l] ) * csum / ( (1.0-theta)*(eps**2) ) - suml[0][l] )
             dNl[l] = int( np.ceil( Ns ) )
@@ -141,7 +144,7 @@ def mlmc(Lmin, Lmax, N0, eps, mlmc_l, gamma, **kwargs):
         if csum == 0:
             converged = True;
             # check to see if we've actually converged
-            rem = ml[L] / ( (2.0**gamma) - 1.0 )
+            rem = ml[L] / ( (2.0**alpha) - 1.0 )
 
             # if we haven't then add a new level, if allowed
             if rem > math.sqrt(theta)*eps:

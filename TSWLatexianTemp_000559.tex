@@ -1,0 +1,139 @@
+\documentclass[]{article}
+
+\usepackage{amsmath}
+\usepackage{enumerate}
+\usepackage{amssymb}                
+\usepackage{amsmath}                
+\usepackage{amsfonts}
+\usepackage{amsthm}
+
+\usepackage{mathtools}
+\usepackage{cool}
+\usepackage{graphicx}
+
+\DeclarePairedDelimiter\abs{\lvert}{\rvert}%
+\DeclarePairedDelimiter\norm{\lVert}{\rVert}%
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{corollary}{Corollary}[theorem]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+
+\theoremstyle{assumption}
+\newtheorem{assumption}{Assumption}
+
+\theoremstyle{remark}
+\newtheorem*{question}{Question}
+\newtheorem*{observation}{Observation}
+\newtheorem*{remark}{Remark}
+
+\setlength{\parindent}{0cm}
+
+\title{Title}
+\author{Author}
+\date{Today}
+
+\begin{document}
+
+\section{}
+
+\subsection{Preliminaries}
+Consider the reflected SDE on an open domain $U$ in $\mathbb{R}^d$:
+\[
+dX_t = b(X_t, t)dt + \sigma(X_t, t)dW_t + \nu(X_t)dL_t
+\]
+Where $W_t = (W_1(t), ..., W_d(t) )$ is a $d$-dimensional Brownian motion, $\nu$ is an oblique reflection vector on the boundary of $U$, and $L_t$ is the local time on the boundary. We will consider the solution on the closed interval $[0, T]$. For simplicity of notation, we will take $b$ and $\sigma$ to be independent of $t$, in which case the SDE reduces to:
+\begin{equation}
+dX_t = b(X_t)dt + \sigma(X_t)dW_t + \nu(X_t)dL_t
+\end{equation}
+where $b: \mathbb{R}^d \rightarrow \mathbb{R}^d$ and $\sigma: \mathbb{R}^d \rightarrow \mathbb{R}^d \times  \mathbb{R}^d$. In coordinate form, we have for $i = 1, ..., d$:
+\begin{equation}
+dX_i(t) = b_i(X_t)dt + \sum_{j = 1}^d \sigma_{ij}(X_t)dW_j(t) + \nu_i(X_t)dL_i(t)
+\end{equation} 
+We are trying to prove the following proposition (variation of Lemma 5.1 on p.9 of the Giles paper):
+\begin{proposition}For all $t \leq T$ there exist constants $c$ and $K(T)$ such that:
+\begin{equation}
+\mathbb{P}\left(\sup_{[0, t]} \norm{X_t} \geq \eta \right) \leq K(T)exp\left( -\frac{c \eta^2}{t}  \right)
+\end{equation}
+\end{proposition}
+We make the following standard assumptions on the coefficient functions $b$ and $\sigma$:
+
+\begin{assumption}The coefficient functions are Lipschitz and satisfy a growth condition, i.e. there exist constants $K_1$ and $K_2$ such that for all $x$ and $y$: 
+
+\begin{equation}
+\abs{b(x) - b(y)} +  \norm{\sigma(x) - \sigma(y)} \leq K_1 \abs{x - y}
+\end{equation}
+%
+\begin{equation}
+\abs{b(x)}^2 + \norm{\sigma(x)}^2 \leq K_2(1 + \abs{x}^2 )
+\end{equation}
+In addition, for simplicity we will assume that the initial condition is $X(0) = 0$ a.s. \\ \\
+\end{assumption}
+Now write the SDE in integrated form. Recalling that we are starting at 0 a.s.:
+\[
+X(t) = \int_0^t b(X_s)ds + \int_0^t  \sigma(X_s)dW_s + \int_0^t \nu(X_s)dL_s
+\]
+X(t) is continuous and is confined to the region $U$. The final term on the RHS is nonnegative and increases only on the boundary of $U$. Thus X(t) is the unique solution to the Skorokhod problem for:
+\[
+H(t) =  \int_0^t b(X_s)ds + \int_0^t  \sigma(X_s)dW_s 
+\]
+Letting $\Gamma: C[0, T] \rightarrow C[0, T]$ be the Skorokhod mapping, we have $X = \Gamma[H]$. Substituting this above, we obtain the functional SDE for H:
+\begin{equation}
+H(t) =  \int_0^t b(\Gamma(H)(s))ds + \int_0^t  \sigma(\Gamma(H)(s))dW_s 
+\end{equation}
+In component form, this is:
+\begin{equation}
+H_i(t) =  \underbrace{ \int_0^t b_i(\Gamma(H)(s))ds }_{A_i(t)}+ \underbrace{\sum_{j=1}^d \int_0^t  \sigma_{ij}(\Gamma(H)(s))dW_s }_{M_i(t)}
+\end{equation}
+In this functional SDE, $\Gamma(H)(t)$ depends on the entire past up to time $t$, i.e. depends on $H_s, 0 \leq s \leq t$. \\ \\
+
+We will consider two cases for the reflecting boundary conditions. First, in the case where U is a convex polygon with nonempty interior and the reflection directions are normal, there is a unique solution to the Skorokhod problem, and the Skorokhod map $\Gamma$ is Lipschitz continuous \cite{Dupuis91}. This can be extended to oblique reflections when U is a convex polygon and the reflection directions are constant on each face and satisfy conditions (look these up!) \cite{Dupuis91}. In the case of normal reflection inside a general smooth, open domain, Lions and Sznitman \cite[Theorem 1.1]{Lions84} showed that there is again a unique solution to the Skorokhod problem, but that the Skohokhod map $\Gamma$ is only Holder continuous of order 1/2 on $[0, T]$.
+
+\subsection{Lipschitz continuity of Skorokhod map}
+First, consider the case where we have a unique solution to the Skorokhod problem, and the map $\Gamma$ is Lipschitz continuous. Recall that the Skorohod map is a map $\Gamma: C[0, T] \rightarrow C[0, T]$, where we are using the $L^\infty$ norm on $C[0, T]$. Let $C_T$ be the Lipschitz constant. Then since $\Gamma(H) = X$, we have:
+\[
+\sup_{[0, T]} \abs{ X(s) } \leq C_T \sup_{[0, T]} \abs{ (H)(s) }
+\]
+Since we can``cut off'' any continuous function at $t$ by sending it linearly to 0 on $[t, T]$, this relation holds with the same Lipschitz constant for all $t \in [0, T]$:
+\[
+\sup_{[0, t]} \abs{ X(s) } \leq C_T \sup_{[0, t]} \abs{ (H)(s) }
+\]
+Then we have the following set of inequalities concerning the proposition we are trying to prove:
+\begin{align*}
+\mathbb{P}\left(\sup_{[0, t]} \norm{X_s} \geq \eta \right) &\leq  \mathbb{P}\left(\sup_{[0, t]} C_T\norm{H_s} \geq \eta \right) \\
+&= \mathbb{P}\left(\sup_{[0, t]} \norm{H_s} \geq \frac{\eta}{C_T} \right)
+\end{align*}
+Since all (reasonable) norms on $\mathbb{R}^d$ are equivalent, we will choose the $l^1$ norm.
+\begin{align*}
+\mathbb{P}\left(\sup_{[0, t]} \norm{X_t} \geq \eta \right) &\leq \mathbb{P}\left(\sup_{[0, t]} \sum_{i=i}^d \abs{H_i(s)} \geq \frac{\eta}{C_T} \right) \\
+&\leq \sum_{i=i}^d \mathbb{P}\left(\sup_{[0, t]}  \abs{H_i(s)} \geq \frac{\eta}{C_T d} \right) \\
+&\leq \sum_{i=i}^d \mathbb{P}\left(\sup_{[0, t]}  \abs{A_i(s)} + \sup_{[0, t]}  \abs{M_i(s)} \geq \frac{\eta}{C_T d} \right) 
+\end{align*}
+where $A_i(s)$ and $M_i(s)$ are as defined above. Then we have:
+\begin{align*}
+\mathbb{P}\left(\sup_{[0, t]} \norm{X_t} \geq \eta \right) &\leq \sum_{i=i}^d \left[ \mathbb{P}\left(\sup_{[0, t]}  \abs{A_i(s)}  \geq \frac{\eta}{2 C_T d} \right) + \mathbb{P}\left(\sup_{[0, t]}  \abs{M_i(s)}  \geq \frac{\eta}{2 C_T d} \right) \right] \\
+&\leq \sum_{i=i}^d \left[ \mathbb{P}\left(\sup_{[0, t]}  A_i(s)  \geq \frac{\eta}{2 C_T d} \right) + \mathbb{P}\left(\sup_{[0, t]}  M_i(s) \geq \frac{\eta}{2 C_T d} \right) \right] 
+\end{align*}
+where in the last line we have removed the absolute value since $A_i(0) = 0$ and $M_i(0) = 0$. We will then bound the two terms on the RHS individually.
+
+\subsection{Ordinary Integral}
+
+\subsection{Stochastic Integral}
+
+% references
+\begin{thebibliography}{9}
+
+\bibitem{Dupuis91}Dupuis, P. and Ishii, H. (1991) On Lipschitz continuity of the solution
+mapping to the Skorokhod problem, with applications, Stochastics and Stochastic Reports,
+35:1, 31-62.
+
+\bibitem{Lions84} Lions, P. L. and Sznitman, A. S. (1984), Stochastic differential equations with reflecting boundary conditions. Comm. Pure Appl. Math., 37: 511–537.
+
+\bibitem{Mao97}Mao, X (1997). Stochastic Differential Equations and Applications, Horwood
+
+\end{thebibliography}
+
+\end{document}

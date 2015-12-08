@@ -18,7 +18,7 @@ float sum_squares(float *x, int dim) {
 	return s;
 }
 
-float step_size(int l, float *x, int dim) {
+float nonadaptive_step(int l, float *x, int dim) {
 	 return pow(2, -(l + 4) );
 }
 
@@ -30,7 +30,6 @@ float adaptive_step(int l, float *x, int dim) {
 	fine = pow(0.25, l + 4);
 	d_factor = (d/4)*(d/4);
 	return fmin( coarse, fmax(fine, d_factor) );
-
 }
 
 // reflect vector in unit ball
@@ -188,8 +187,6 @@ void rbm_ball(int l, int N, double *sums) {
 		sums[4] += Df;
 		sums[5] += Df*Df;
 	}
-
-
 }
 
 int main() {
