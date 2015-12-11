@@ -32,13 +32,13 @@
 
 \setlength{\parindent}{0cm}
 
-\title{Title}
-\author{Author}
-\date{Today}
-
 \begin{document}
 
-\section{}
+\title{Notes on MLMC schemes for Reflected Diffusions}
+\author{Ross Parker}
+\maketitle
+
+\section{Bounds on solutions to reflected SDEs}
 
 \subsection{Preliminaries}
 Consider the reflected SDE on an open domain $U$ in $\mathbb{R}^d$:
@@ -64,11 +64,16 @@ We make the following standard assumptions on the coefficient functions $b$ and 
 \begin{assumption}The coefficient functions are Lipschitz and satisfy a growth condition, i.e. there exist constants $K_1$ and $K_2$ such that for all $x$ and $y$: 
 
 \begin{equation}
-\abs{b(x) - b(y)} +  \norm{\sigma(x) - \sigma(y)} \leq K_1 \abs{x - y}
+\abs{b(x) - b(y)}  \leq K_1 \abs{x - y}
 \end{equation}
-%
 \begin{equation}
-\abs{b(x)}^2 + \norm{\sigma(x)}^2 \leq K_2(1 + \abs{x}^2 )
+\norm{\sigma(x) - \sigma(y)} \leq K_1 \abs{x - y}
+\end{equation}
+\begin{equation}
+\abs{b(x)}^2 \leq K_2(1 + \abs{x}^2 )
+\end{equation}
+\begin{equation}
+\norm{\sigma(x)}^2 \leq K_2(1 + \abs{x}^2 )
 \end{equation}
 In addition, for simplicity we will assume that the initial condition is $X(0) = 0$ a.s. \\ \\
 \end{assumption}
@@ -155,7 +160,7 @@ The same is true for the diffusion coefficient function $\sigma$. Thus we have a
 \begin{equation}
 \mathbb{E}\int_0^T \abs{H_t}^2 dt < \infty
 \end{equation}
-(I am pretty sure this last one is what is implied by the notation $M^2$ in \cite{Mao97}, but I would need to see the entire text, not just the Google books preview, and the library seems to be missing their copy.)
+(I don't actually have this book, since the library seems to be missing their copy, but I was able to get this from the Google books preview and the list of notation at the beginning.)
 
 \subsubsection{Ordinary Integral}
 First we will find a bound the ordinary integral $A(t)$. \\ \\
@@ -184,7 +189,11 @@ Here we take the $l^2$ norm on $\mathbb{R}^d$, which gives us:
 \begin{equation} \label{expmg2}
 Z_i(t) = \exp \left\{ \sum_{j=1}^d \lambda \int_0^t \tilde{\sigma}_{ij}(\tilde{H}_s) dW_j(s) - \frac{1}{2} \lambda^2 \int_0^t \sum_{j=1}^d \abs{ \tilde{\sigma}_{ij}(\tilde{H}_s) }^2 ds  \right\}
 \end{equation}
-Following the analysis in \cite[p. 191]{KS91}, we first show that $Z_i(t)$ is a local martingale. By the property that the Skorokhod map $\Gamma$ only depends on the past of a stochastic process, $\tilde{\sigma}_{ij}(\tilde{H}_s)$ is a measurable, $F_s$-adapted process for all $s$. Furthermore for all $j$ we have:
+Following the analysis in \cite[p. 191]{KS91}, we first show that $Z_i(t)$ is a local martingale. By the property that the Skorokhod map $\Gamma$ only depends on the past of a stochastic process, $\tilde{\sigma}_{ij}(\tilde{H}_s)$ is a measurable, $F_s$-adapted process for all $s$. Furthermore for all $j$ we should be able to show:
+\[
+\mathbb{P}\left( \int_0^T \tilde{\sigma}_{ij}(\tilde{H}_s)^2 ds < \infty \right) = 1
+\]
+This should follow from the square integrability of the solution $H_t$ (CHECK THIS!) (This is certainly true if $\sigma$ is bounded.)\\
 
 For our analysis, we would like $Z_i(t)$ to be a martingale. \\
 
@@ -202,7 +211,7 @@ Recall that:
 \[
 M_i(t) = \sum_{j=1}^d \int_0^t  \tilde{\sigma}_{ij}(\tilde{H}_s)dW_s
 \]
-$M_i(t)$ is a stochastic integral, and so is a continuous local martingale. The fact that is is a true martingale follows from the square integrability of the solution $H_t$ (CHECK THIS!) \\
+$M_i(t)$ is a stochastic integral, and so is a continuous local martingale. The fact that is is a true martingale should from the square integrability of the solution $H_t$ (CHECK THIS!) \\
 
 Since the function $\exp \lambda x$ is convex, $\exp \lambda M_i(t)$ is a submartingale. Thus by the fact that $\exp \lambda x$ is increasing and by Doob's martingale inequality:
 \begin{align*}
@@ -230,7 +239,7 @@ Using this bound above gives us:
 \end{align*}
 Inside the parentheses on the RHS is a quadratic in $\lambda$, which takes it's minimum value at the vertex $\lambda = \eta / 2 C_T d^2 K_s^2 t$. Substituting this value of $\lambda$ gives us:
 \begin{equation}
-\mathbb{P}\left(\sup_{[0, t]}  M_i(s) \geq \frac{\eta}{2 C_T d} \right) \leq \exp \left( - \frac{\eta^2}{t} \frac{1}{8 C_T^2 d^3 K_s^2} } \right)
+\mathbb{P}\left(\sup_{[0, t]}  M_i(s) \geq \frac{\eta}{2 C_T d} \right) \leq \exp \left( - \frac{\eta^2}{t} \frac{1}{8 C_T^2 d^3 K_s^2}  \right)
 \end{equation}
 
 % references
